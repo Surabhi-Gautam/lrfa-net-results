@@ -1,0 +1,57 @@
+Device: MPS (Apple Silicon GPU)
+Subjects  train=420  val=90  test=90
+Building datasets …
+Train pairs: 6000  |  Val pairs: 800
+Model parameters: 12,302,401
+
+=== Phase 1: 10 epochs (backbone frozen) ===
+  E01 | tr_loss=0.5830 tr_acc=68.23% | vl_loss=0.5109 vl_acc=78.00% | 1.1m
+  E02 | tr_loss=0.4923 tr_acc=76.73% | vl_loss=0.3952 vl_acc=86.25% | 2.1m
+  E03 | tr_loss=0.4502 tr_acc=79.13% | vl_loss=0.3533 vl_acc=86.75% | 3.2m
+  E04 | tr_loss=0.4127 tr_acc=81.38% | vl_loss=0.3008 vl_acc=89.62% | 4.2m
+  E05 | tr_loss=0.3745 tr_acc=83.62% | vl_loss=0.2755 vl_acc=89.62% | 5.3m
+  E06 | tr_loss=0.3521 tr_acc=84.65% | vl_loss=0.2370 vl_acc=91.00% | 6.3m
+  E07 | tr_loss=0.3259 tr_acc=86.07% | vl_loss=0.2251 vl_acc=90.88% | 7.4m
+  E08 | tr_loss=0.3043 tr_acc=87.18% | vl_loss=0.2038 vl_acc=91.75% | 8.4m
+  E09 | tr_loss=0.2845 tr_acc=87.72% | vl_loss=0.1689 vl_acc=93.38% | 9.6m
+  E10 | tr_loss=0.2749 tr_acc=88.48% | vl_loss=0.1474 vl_acc=94.00% | 10.8m
+
+=== Phase 2: 20 epochs (full model) ===
+  E11 | tr_loss=0.2234 tr_acc=90.98% | vl_loss=0.1082 vl_acc=96.25% | 18.3m
+     ↑ Best (96.25%)
+Device: MPS (Apple Silicon GPU)
+Rebuilding datasets …
+Train: 6000 pairs | Val: 800 pairs
+Loaded checkpoint (best val=96.25%)
+Trainable params (layer4 + new): 1,125,889
+
+=== Continuing Phase 2 (8 epochs, layer4 partial unfreeze) ===
+  E12 | tr_loss=0.1695 tr_acc=93.63% | vl_loss=0.1093 vl_acc=96.25% | +1.6m
+  E13 | tr_loss=0.1640 tr_acc=94.13% | vl_loss=0.1039 vl_acc=96.50% | +3.4m
+     ↑ New best (96.50%)
+  E14 | tr_loss=0.1637 tr_acc=94.15% | vl_loss=0.1038 vl_acc=96.88% | +5.4m
+     ↑ New best (96.88%)
+  E15 | tr_loss=0.1528 tr_acc=94.33% | vl_loss=0.0982 vl_acc=96.88% | +7.3m
+  E16 | tr_loss=0.1560 tr_acc=94.53% | vl_loss=0.1069 vl_acc=96.75% | +9.0m
+  E17 | tr_loss=0.1523 tr_acc=94.33% | vl_loss=0.0972 vl_acc=97.12% | +10.5m
+     ↑ New best (97.12%)
+  E18 | tr_loss=0.1591 tr_acc=94.03% | vl_loss=0.0978 vl_acc=97.12% | +12.1m
+  E19 | tr_loss=0.1468 tr_acc=94.87% | vl_loss=0.0997 vl_acc=96.75% | +13.8m
+
+Best val acc: 97.12%
+
+--- Per-Level Evaluation ---
+  L1 (Clean): Acc=96.17%  AUC=0.9960  FAR=7.00%  FRR=0.67%
+  L2 (Easy): Acc=94.33%  AUC=0.9946  FAR=9.00%  FRR=2.33%
+  L3 (Medium): Acc=93.33%  AUC=0.9817  FAR=7.67%  FRR=5.67%
+  L4 (Hard): Acc=92.83%  AUC=0.9779  FAR=7.67%  FRR=6.67%
+
+Done in 14.4 min — results at results/lrfa_results.json
+
+── Final Results ──────────────────────────────────────────────────
+Level      LRFA-Net   Base Paper   Improvement
+---------------------------------------------
+L1           96.17%       99.47%      -3.30%
+L2           94.33%       94.00% +      0.33%
+L3           93.33%       60.00% +     33.33%
+L4           92.83%       55.56% +     37.27%
