@@ -62,6 +62,7 @@ page = st.sidebar.radio("Navigate", [
     "📉 ROC & AUC",
     "📰 vs Base Paper",
     "🌫️ Gaussian Noise",
+    "🗺️ RQE & APS Visualization",
     "📚 Literature Comparison",
 ])
 
@@ -425,7 +426,75 @@ elif page == "🌫️ Gaussian Noise":
         st.dataframe(df_g[available].round(4), use_container_width=True, hide_index=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PAGE 7 — LITERATURE COMPARISON
+# PAGE 7 — RQE & APS VISUALIZATION
+# ══════════════════════════════════════════════════════════════════════════════
+elif page == "🗺️ RQE & APS Visualization":
+    st.title("🗺️ Ridge Quality Estimation (RQE) & Adaptive Patch Selection (APS)")
+    st.markdown(
+        "The grid below shows how LRFA-Net preprocesses fingerprints before feature "
+        "extraction. **Row 1** is a clean (L1) fingerprint; **Row 2** is a hard-altered "
+        "(L4) obliterated fingerprint. Each column shows: the original image, the 4×4 "
+        "quality heatmap scored by variance-of-Laplacian per patch, and the image after "
+        "APS masks the 4 lowest-quality patches with neutral gray."
+    )
+    st.divider()
+
+    viz_path = os.path.join(BASE, "quality_aps_visualization.png")
+    if os.path.exists(viz_path):
+        st.image(viz_path, use_container_width=True)
+    else:
+        st.error("Visualization image not found. Please ensure quality_aps_visualization.png is in the repo.")
+
+    st.divider()
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("How RQE Works")
+        st.markdown("""
+**Ridge Quality Estimation (RQE)** divides each 224×224 fingerprint into a
+**4×4 grid of 16 patches** (each 56×56 px). For every patch:
+
+1. Apply the **Laplacian operator** (∇²) to detect edges/ridges
+2. Compute the **variance** of the Laplacian response
+3. High variance → sharp ridges → **high quality score**
+4. Low variance → blurred/obliterated → **low quality score**
+5. All 16 scores normalised to **[0, 1]**
+
+The ✕ marks on the heatmap show which 4 patches are discarded.
+""")
+    with col2:
+        st.subheader("How APS Works")
+        st.markdown("""
+**Adaptive Patch Selection (APS)** uses the RQE scores to:
+
+1. **Rank** all 16 patches by quality score
+2. **Keep** the top-12 patches unchanged
+3. **Replace** the bottom-4 patches with **neutral gray (128)**
+   — after normalisation this maps to 0, contributing nothing
+
+This prevents corrupted/obliterated regions from polluting the
+ResNet18 feature embeddings. The **Quality-Weighted Attention (QWA)**
+module then further down-weights low-quality regions in the attention scores.
+
+**Result:** Only reliable ridge information drives the similarity score.
+""")
+
+    st.divider()
+    st.subheader("Impact on Accuracy")
+    impact_data = {
+        "Variant":          ["Baseline (no RQE/APS/QWA)", "+ QWA only", "+ RQE+APS only", "Full LRFA-Net"],
+        "L1 Clean":         ["95.33%", "95.83%", "95.67%", "96.17%"],
+        "L2 Easy":          ["91.83%", "92.67%", "93.17%", "94.33%"],
+        "L3 Medium":        ["83.17%", "88.33%", "90.83%", "93.33%"],
+        "L4 Hard":          ["78.33%", "83.83%", "87.17%", "92.83%"],
+        "Avg Accuracy":     ["87.17%", "90.17%", "91.71%", "94.17%"],
+    }
+    import pandas as pd
+    st.dataframe(pd.DataFrame(impact_data), use_container_width=True, hide_index=True)
+    st.caption("Ablation study: RQE+APS contributes the largest single gain, especially on L3 (+7.66%) and L4 (+8.84%).")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAGE 8 — LITERATURE COMPARISON
 # ══════════════════════════════════════════════════════════════════════════════
 elif page == "📚 Literature Comparison":
     st.title("📚 Literature Comparison — 26 Papers (2020–2026)")
