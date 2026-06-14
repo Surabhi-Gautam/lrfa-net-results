@@ -439,11 +439,11 @@ elif page == "🗺️ RQE & APS Visualization":
     )
     st.divider()
 
-    viz_path = os.path.join(BASE, "quality_aps_visualization.png")
+    viz_path = os.path.join(BASE, "fig_rqe.png")
     if os.path.exists(viz_path):
         st.image(viz_path, use_container_width=True)
     else:
-        st.error("Visualization image not found. Please ensure quality_aps_visualization.png is in the repo.")
+        st.error("fig_rqe.png not found in repo.")
 
     st.divider()
 
